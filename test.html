@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>GREEN API</title>
+
+<style>
+
+body {
+  background-color: #299e35;
+  color: white;
+  font-family: Arial;
+}
+
+.container {
+  display: flex;
+  gap: 10px;
+}
+
+.left {
+  width: 100%;
+}
+
+.right {
+  width: 100%;
+}
+
+.right textarea {
+  width: 89%;
+  height: 89%;
+}
+
+/* поля */
+input, textarea {
+  background-color: white;
+  color: black;
+  padding: 8px;
+  display: block;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+}
+
+/* размеры */
+#idInstance { width: 70%; }
+#apiToken { width: 70%; }
+#phone { width: 150px; }
+#message { width: 70%; 
+height: 100px;
+}
+#fileUrl { width: 150px; }
+
+/* кнопки (базово) */
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* индивидуальные кнопки */
+#getSettingsBtn {
+  background-color: #2196F3;
+  color: #eeeff2;
+  width: 150px;
+}
+
+#getStateBtn {
+  background-color: #2196F3;
+  color: #eeeff2;
+  width: 150px;
+}
+
+#sendMessageBtn {
+  background-color: #2196F3;
+  color: #eeeff2;
+  width: 150px;
+}
+
+#sendFileBtn {
+  background-color: #2196F3;
+  color: #eeeff2;
+  width: 150px;
+}
+
+/* блоки "в строку" */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* вертикальный блок кнопок */
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+hr {
+  margin: 10px 0;
+  background-color: #299e35;
+  width: 74%;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>GREEN-API интерфейс</h2>
+
+<div class="container">
+
+  <div class="left">
+
+    <label>ID Instance:</label>
+    <input id="idInstance">
+
+    <label>ApiTokenInstance:</label>
+    <input id="apiToken">
+
+    <!-- КНОПКИ ПОД ApiToken -->
+    <div class="column">
+      <button id="getSettingsBtn" onclick="getSettings()">getSettings</button>
+      <button id="getStateBtn" onclick="getStateInstance()">getStateInstance</button>
+    </div>
+
+    <hr>
+
+    <label>Телефон:</label>
+    <input id="phone">
+
+    <label>Сообщение:</label>
+    <div class="row">
+      <input id="message">
+      <button id="sendMessageBtn" onclick="sendMessage()">sendMessage</button>
+    </div>
+
+    <label>URL файла:</label>
+    <div class="row">
+      <input id="fileUrl">
+      <button id="sendFileBtn" onclick="sendFileByUrl()">sendFileByUrl</button>
+    </div>
+
+  </div>
+
+  <div class="right">
+    <h3>Ответ API:</h3>
+    <textarea id="response" readonly></textarea>
+  </div>
+
+</div>
+
+<script>
+function getBaseUrl() {
+    const id = document.getElementById("idInstance").value;
+    return `https://api.green-api.com/waInstance${id}`;
+}
+
+function showResponse(data) {
+    document.getElementById("response").value =
+        JSON.stringify(data, null, 2);
+}
+
+async function getSettings() {
+    const token = document.getElementById("apiToken").value;
+    const url = getBaseUrl() + `/getSettings/${token}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+    showResponse(data);
+}
+
+async function getStateInstance() {
+    const token = document.getElementById("apiToken").value;
+    const url = getBaseUrl() + `/getStateInstance/${token}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+    showResponse(data);
+}
+
+async function sendMessage() {
+    const token = document.getElementById("apiToken").value;
+    const url = getBaseUrl() + `/sendMessage/${token}`;
+
+    const body = {
+        chatId: document.getElementById("phone").value + "@c.us",
+        message: document.getElementById("message").value
+    };
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    showResponse(data);
+}
+
+async function sendFileByUrl() {
+    const token = document.getElementById("apiToken").value;
+    const url = getBaseUrl() + `/sendFileByUrl/${token}`;
+
+    const body = {
+        chatId: document.getElementById("phone").value + "@c.us",
+        urlFile: document.getElementById("fileUrl").value,
+        fileName: "file"
+    };
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    showResponse(data);
+}
+</script>
+
+</body>
+</html>
